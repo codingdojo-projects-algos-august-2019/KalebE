@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        .dollars:before { content:'$'; }
+    </style>
+    <title>{{user['fname']}}'s Farm</title>
+</head>
+<body>
+    <div class="jumbotron text-center">
+        <h1>Farm Analysis from FarmValue</h1>
+    </div>
+
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <p class="navbar-brand">Hi {{user['fname']}}</p>
+        </div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="/farms">Your Farm</a></li>
+                <li><a href="/thoughts">FarmValue Board</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span>Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    {% with messages = get_flashed_messages() %}     
+        {% if messages %}                            
+            {% for message in messages %}
+            <div class="alert alert-danger">            
+                <p>{{message}}</p>
+            </div>                   
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="container">
+
+    {% if farm_values['fields'] == 0 %}
+    <h2>{{user['fname']}}, please enter your farms inforamtion!</h2>
+    {% else %}
+    <h3>Currently, you operate a {{farm_values['total_acres']}} acre farm that has {{farm_values['fields']}} fields with a land value of over <span class ="dollars"> {{farm_values['total_value']}} </span> and is on track to generate <span class ="dollars"> {{farm_values['yearly_FCF']}} </span> of free cash flow!</h3>
+    {% endif %}
+    
+    </div>
+
+    <div class="container">
+    
+    <h3>Build your farm!</h3>
+
+    <form action="/post_farm" method="POST"> 
+    <table>
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Acres</th>
+                <th>Acre Value</th>
+                <th>Crop</th>
+                <th>Crop Price</th>
+                <th>Crop Yield</th>
+                <th>Expenses</th>
+                <th>Comments</th>
+            </tr>
+        </thead>                   
+        <tbody>
+            <tr>
+                <td><input type="text" name="location"></td>
+                <td><input type="float" name="acres"></td>
+                <td><input type="float" name="acre_value"></td>
+                <td><input type="text" name="crop"></td>
+                <td><input type="float" name="crop_price"></td>
+                <td><input type="float" name="crop_yield"></td>
+                <td><input type="float" name="expenses"></td>
+                <td><input type="text" name="comments"></td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="submit" value="Post a Field">
+    </form>
+    </div>
+
+    <div class="container">
+        <h3>{{user['fname']}}'s Current Farm</h3>
+
+    {% if farm_values['fields'] == 0 %}
+    <h2>{{user['fname']}} has no farm data to analyze!</h2>
+    {% else %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Acres</th>
+                <th>Acre Value</th>
+                <th>Land Value</th>
+                <th>Crop</th>
+                <th>Crop Price</th>
+                <th>Crop Yield</th>
+                <th>Revenue</th>
+                <th>Expenses</th>
+                <th>Cash Flow</th>
+                <th>Last Updated</th>
+                <th>Comments</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>                    
+        <tbody>
+        {% for field in farm %}
+            <tr>
+                <td>{{field['location']}}</td>
+                <td>{{field['acres']}}</td>
+                <td>{{field['price_per_acre']}}</td>
+                <td>{{field['land_value']}}</td>
+                <td>{{field['crop']}}</td>
+                <td>{{field['crop_price']}}</td>
+                <td>{{field['crop_yield']}}</td>
+                <td>{{field['revenue']}}</td>
+                <td>{{field['expenses']}}</td>
+                <td>{{field['cash_flow']}}</td>
+                <td>{{field['updated_at']}}</td>
+                <td>{{field['comments']}}</td>
+                <td><p class="details"><a href="/edit/{{field['idfarms']}}">Edit</a></p></td>
+                <td><p class="details"><a href="/deletefield/{{field['idfarms']}}">Delete</a></p></td>
+            </tr>
+        {% endfor %}  
+        </tbody>
+    </table>
+    {% endif %}
+
+    </div>
+
+    <div class="container-fluid text-center">
+        <h1>Farm Breakdown</h1>
+        <div class="col-sm-6 text-center">
+                <h2>Fields</h2>
+                <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Fields</th>
+                                <th>Total Acres</th>
+                            </tr>
+                        </thead>                    
+                        <tbody>
+                            <tr>
+                                <td>{{farm_values['fields']}}</td>
+                                <td>{{farm_values['total_acres']}}</td>
+                            </tr>
+                        </tbody>
+                </table>
+        </div>
+        <div class="col-sm-6 text-center">
+
+                        <h2>Finances</h2>
+                        <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Total Revenue</th>
+                                        <th>Total Expenses</th>
+                                        <th>Total Cash Flow</th>
+                                        <th>Total Land Value</th>
+                                        <th>Expected Value at Year End</th>
+                                    </tr>
+                                </thead>                    
+                                <tbody>
+                                    <tr>
+                                        <td>{{farm_values['total_revenue']}}</td>
+                                        <td>{{farm_values['total_expenses']}}</td>
+                                        <td>{{farm_values['yearly_FCF']}}</td>
+                                        <td>{{farm_values['total_value']}}</td>
+                                        <td>{{farm_values['year_end_value']}}</td>
+                                    </tr>
+                                </tbody>
+                        </table>
+
+        </div>
+    </div>
+</body>
+</html>

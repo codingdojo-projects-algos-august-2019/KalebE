@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <title>Welcome to the FarmValue Board</title>
+</head>
+<body>
+    <div class="jumbotron text-center">
+        <h1>Welocome to the FarmValue Board</h1>
+    </div>
+
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <p class="navbar-brand">Hi {{user['fname']}}</p>
+        </div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Home</a></li>
+                <li><a href="/farms">{{user['fname']}}'s Farm</a></li>
+                <li><a href="/thoughts">FarmValue Board</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span>Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <hr>
+    {% with messages = get_flashed_messages() %}     <!-- declare a variable called messages -->
+        {% if messages %}                            <!-- check if there are any messages -->
+            {% for message in messages %}
+            <div class="alert alert-danger">            <!-- loop through the messages -->
+                <p>{{message}}</p>
+            </div>                   <!-- display each message in a paragraph tag -->
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        <h2>Farmers on FarmValue</h2>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </tr>
+            </thead>                    
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{user['fname']}}</td>
+                    <td>{{user['lname']}}</td>
+                </tr>
+            {% endfor %}  
+            </tbody>
+        </table>
+    
+        <p>Ask questions, get answers, and get to know other farmers on FarmValue!</p>
+
+    </div>
+
+    <div class="container-fluid text-center">
+        
+        <h3>Post a Comment or Question Here!!!</h3>
+
+        <form action="/post_thoughts" method="POST">
+            <input type="text" class="form-control" name="thought_content">
+            <input type="submit" value="Post">
+        </form>
+    
+    </div>
+
+    <div class="container">
+
+    {% for thought in thoughts %}
+        <div>
+            <p>{{thought['fname']}} says:</p>
+            <div>
+                <p>{{thought['thoughts']}}</p>
+                <p><a href="/details/{{thought['idthoughts']}}">Details</a>    {{thought['likes']}} people like this</p>
+            </div>
+            <div>
+            {% if thought['user_id'] == user['id'] %}
+            <a href="/delete/{{thought['idthoughts']}}"><button>Delete!</button></a>
+            {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+    </div>
+    
+</body>
+</html>
